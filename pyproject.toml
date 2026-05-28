@@ -1,0 +1,32 @@
+[project]
+name = "civic-ai-mcp-toolkit"
+version = "0.1.0"
+description = "The shared shape behind every MCP server in the civic-AI portfolio: server factory, @traced decorator, structured logging, error envelopes, fixture loader, and a `civic-ai-mcp init` scaffolder. Distilled from six production MCPs."
+readme = "README.md"
+requires-python = ">=3.10"
+authors = [{ name = "Mikel" }]
+license = { text = "MIT" }
+
+dependencies = [
+    "mcp>=1.0.0",
+]
+
+[project.scripts]
+civic-ai-mcp = "civic_ai_mcp.cli:main"
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["civic_ai_mcp*"]
+
+[tool.setuptools.package-data]
+civic_ai_mcp = ["templates/*.template"]
+
+[tool.ruff]
+line-length = 100
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
