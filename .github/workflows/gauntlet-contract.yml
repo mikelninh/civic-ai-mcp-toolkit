@@ -1,0 +1,35 @@
+name: Gauntlet Contract
+
+on:
+  pull_request:
+  push:
+    branches: [feat/gauntlet-adapter]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate Gauntlet programme
+        run: |
+          python - <<'PY'
+          import json
+          p=json.load(open('gauntlet/program.json'))
+          required={'version','system','objective','fitness','mutable','forbidden','starter_cases','acceptance','downstream_profiles'}
+          missing=required-set(p)
+          assert not missing, f'missing keys: {sorted(missing)}'
+          assert p['fitness'].get('primary') and p['fitness'].get('hard_gates')
+          assert len(p['starter_cases']) >= 3
+          assert p['mutable'] and p['forbidden']
+          assert not set(p['mutable']) & set(p['forbidden'])
+          required_profiles={'elterngeld-mcp','pmm-mcp','flight-rights-mcp','wohngeld-mcp','agb-reader-mcp'}
+          assert required_profiles <= set(p['downstream_profiles']), 'missing civic MCP profile'
+          print('Gauntlet contract OK:', p['system'])
+          PY
+      - name: Install toolkit test environment
+        run: pip install -e . pytest
+      - name: Run shared MCP conformance tests
+        run: pytest -q
